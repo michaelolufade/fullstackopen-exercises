@@ -1,0 +1,15 @@
+sequenceDiagram
+    participant browser
+    participant server
+
+    Note right of browser: The user clicks the submit button
+    
+    Note right of browser: JavaScript intercepts the event, and<br/>prevents the default behavior of reloading,<br/> then creates a new li note object on.
+
+    browser->>server: POST https://studies.cs.helsinki.fi/exampleapp/new_note_spa
+    activate server
+    Note left of server: Server saves the note to data.json
+    server-->>browser: 201 Created (Server returns new_note_spa)
+    deactivate server
+
+    Note right of browser: The callback function in main.js<br/>rerenders the note list on the page<br/>without reloading.
