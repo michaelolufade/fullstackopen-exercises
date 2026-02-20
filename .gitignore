@@ -24,8 +24,7 @@ dist-ssr
 *.sw?
 
 # Additional files and directories to ignore
-public/
-*.config.js
-package*.json
-node_modules/
-assets/
+part1/*
+!course_info
+!anecdote
+!unicafe
