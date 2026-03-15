@@ -1,12 +1,14 @@
 import Person from './person'
 
 
-const Numbers = ({persons}) => {
+const Numbers = ({persons, newSearch, setPersons, showNotification}) => {
+  const searchResult = persons.filter(person => (person.name.toLowerCase().startsWith(newSearch.toLowerCase())))
+
     return (
       <>
         <h2>Numbers</h2>
-          {persons.map(person => (
-            <Person key={person.id} name={person.name} number={person.number}/>
+          {searchResult.map(person => (
+            <Person key={person.id} name={person.name} number={person.number} id={person.id} setPersons={setPersons} showNotification={showNotification}/>
           ))}
       </>
     )

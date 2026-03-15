@@ -1,15 +1,7 @@
-const Filter = ({persons, newSearch, setSearch, setPersonsToShow}) => {
+const Filter = ({ newSearch, setSearch}) => {
     const handleSearch = (event) => {
       const searchString = event.target.value
       setSearch(searchString)
-      const searchResult = persons.filter(person => (person.name.toLowerCase().startsWith(searchString.toLowerCase())))
-
-      if (searchResult) {
-        setPersonsToShow(searchResult)
-      }
-      else {
-        setPersonsToShow(persons)
-      }
     }
 
     return (

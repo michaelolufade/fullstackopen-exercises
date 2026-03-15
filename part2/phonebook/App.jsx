@@ -1,55 +1,84 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import axios from 'axios'
 import Numbers from './components/numbers'
 import PersonForm from './components/personForm'
 import Filter from './components/filter'
+import personService from './services/persons'
+import Notification from './components/notification'
+
+
 
 
 const App = () => {
-  const [persons, setPersons] = useState([
-    { name: 'Arto Hellas', number: '040-123456', id: 1 },
-    { name: 'Ada Lovelace', number: '39-44-5323523', id: 2 },
-    { name: 'Dan Abramov', number: '12-43-234345', id: 3 },
-    { name: 'Mary Poppendieck', number: '39-23-6423122', id: 4 }
-  ])
+  const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState("")
   const [newNumber, setNewNumber] = useState("")
   const [newSearch, setSearch] = useState("")
-  const [personsToShow, setPersonsToShow] = useState(persons)
+  const [newNotification, setNoification] = useState({message: "", color: ""})
+
+  useEffect(() => {
+    axios.get("http://localhost:3001/persons").then(response => {
+      setPersons(response.data)
+    })
+  }, [])
+
+  const showNotification = (message, color) => {
+    setNoification(
+      {message, color}
+    )
+    setTimeout(() => {
+      setNoification({message: "", color: ""})
+    }, 5000)
+  }
 
   const addNewPerson = (event) => {
     event.preventDefault()
-
-    const existingPerson = persons.find(person => person.name === newName);
-
-    if (existingPerson) {
-      alert(`${newName} is already added to phonebook!`)
-      setNewName("")
-      setNewNumber("")
-      return
-    }
-
     if (!newName || !newNumber) {
       alert("Enter a valid name and phone number")
       return
     }
     const newPerson = {
       name: newName,
-      number: newNumber
+      number: newNumber,
     }
 
-    const newPersonsList = persons.concat(newPerson)
-    setPersons(newPersonsList)
-    setSearch("")
-    setPersonsToShow(newPersonsList)
-  }
+    const existingPerson = persons.find(person => person.name.toLowerCase() === newName.toLowerCase());
 
+    if (existingPerson) {
+      const resp = window.confirm(`${newName} is already added to phonebook, replace the old number with new one?`)
+
+      if (resp) {
+        personService.update(existingPerson.id, newNumber).then(updatedPerson => {
+          const newPersonsList = persons.map(person => person.id === existingPerson.id ? updatedPerson : person)
+          setPersons(newPersonsList)
+          showNotification(`Successfully updated phone number for ${updatedPerson.name}`, "green")
+        })
+      }
+      else {
+        return
+      }
+    }
+    else {
+      personService.create(newPerson)
+      .then(response => {
+        console.log(response)
+        const newPersonsList = persons.concat(response)
+        setPersons(newPersonsList)
+        showNotification(`Added ${response.name}`, "green")
+      })
+    }
+    setSearch("")
+    setNewName("")
+    setNewNumber("")
+  }
 
   return (
     <div>
       <h2>Phonebook</h2>
-      <Filter persons={persons} newSearch={newSearch} setSearch={setSearch} setPersonsToShow={setPersonsToShow}/>
+      <Notification message={newNotification.message} color={newNotification.color} />
+      <Filter newSearch={newSearch} setSearch={setSearch} />
       <PersonForm clickHandler={addNewPerson} newName={newName} setNewName={setNewName} newNumber={newNumber} setNewNumber={setNewNumber} />
-      <Numbers persons={personsToShow} />
+      <Numbers persons={persons} newSearch={newSearch} setPersons={setPersons} showNotification={showNotification} />
     </div>
   )
 }
