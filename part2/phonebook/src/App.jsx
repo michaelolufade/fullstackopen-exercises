@@ -17,8 +17,8 @@ const App = () => {
   const [newNotification, setNoification] = useState({ message: "", color: "" })
 
   useEffect(() => {
-    axios.get("http://localhost:3001/api/persons").then(response => {
-      setPersons(response.data)
+    personService.getAll().then(response => {
+      setPersons(response)
     })
   }, [])
 
