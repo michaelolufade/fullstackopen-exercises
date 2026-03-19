@@ -24,6 +24,6 @@ dist-ssr
 *.sw?
 
 # Additional files and directories to ignore
-/learn-react
-/backend
-
+/*
+!.gitignore
+!/src/

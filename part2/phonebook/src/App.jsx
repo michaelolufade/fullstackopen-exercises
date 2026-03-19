@@ -14,20 +14,20 @@ const App = () => {
   const [newName, setNewName] = useState("")
   const [newNumber, setNewNumber] = useState("")
   const [newSearch, setSearch] = useState("")
-  const [newNotification, setNoification] = useState({message: "", color: ""})
+  const [newNotification, setNoification] = useState({ message: "", color: "" })
 
   useEffect(() => {
-    axios.get("http://localhost:3001/persons").then(response => {
+    axios.get("http://localhost:3001/api/persons").then(response => {
       setPersons(response.data)
     })
   }, [])
 
   const showNotification = (message, color) => {
     setNoification(
-      {message, color}
+      { message, color }
     )
     setTimeout(() => {
-      setNoification({message: "", color: ""})
+      setNoification({ message: "", color: "" })
     }, 5000)
   }
 
@@ -48,10 +48,10 @@ const App = () => {
       const resp = window.confirm(`${newName} is already added to phonebook, replace the old number with new one?`)
 
       if (resp) {
-        personService.update(existingPerson.id, newNumber).then(updatedPerson => {
-          const newPersonsList = persons.map(person => person.id === existingPerson.id ? updatedPerson : person)
-          setPersons(newPersonsList)
-          showNotification(`Successfully updated phone number for ${updatedPerson.name}`, "green")
+        personService.update(existingPerson.id, newNumber).then(updatedPersons => {
+          // const newPersonsList = persons.map(person => person.id === existingPerson.id ? updatedPerson : person)
+          setPersons(updatedPersons)
+          showNotification(`Successfully updated phone number for ${existingPerson.name}`, "green")
         })
       }
       else {
@@ -60,12 +60,10 @@ const App = () => {
     }
     else {
       personService.create(newPerson)
-      .then(response => {
-        console.log(response)
-        const newPersonsList = persons.concat(response)
-        setPersons(newPersonsList)
-        showNotification(`Added ${response.name}`, "green")
-      })
+        .then(response => {
+          setPersons(response)
+          showNotification(`Added ${newPerson.name}`, "green")
+        })
     }
     setSearch("")
     setNewName("")
