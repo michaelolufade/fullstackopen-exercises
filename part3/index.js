@@ -1,6 +1,9 @@
+require("dotenv").config()
+
 const express = require("express")
 const morgan = require("morgan")
 const cors = require("cors")
+const Person = require("./models/person")
 
 
 const app = express()
@@ -11,63 +14,38 @@ app.use(cors())
 app.use(express.static('dist'))
 
 
-let persons = [
-    {
-        "id": "1",
-        "name": "Arto Hellas",
-        "number": "040-123456"
-    },
-    {
-        "id": "2",
-        "name": "Ada Lovelace",
-        "number": "39-44-5323523"
-    },
-    {
-        "id": "3",
-        "name": "Dan Abramov",
-        "number": "12-43-234345"
-    },
-    {
-        "id": "4",
-        "name": "Mary Poppendieck",
-        "number": "39-23-6423122"
-    }
-]
-
-
 app.get("/api/persons", (request, response) => {
-    response.json(persons)
+    Person.find({}).then(persons => {
+            response.json(persons)
+        })
 })
 
 app.get("/info", (request, response) => {
-    const msg = `PhoneBook has info for ${persons.length} people<br />${new Date()}`
-    console.log(msg)
-    response.send(msg)
+    Person.find({}).then(persons => {
+        const msg = `PhoneBook has info for ${persons.length} people<br />${new Date()}`
+        console.log(msg)
+        response.send(msg)
+    })
 })
 
 app.get("/api/persons/:id", (request, response) => {
-    const id = request.params.id
-    const person = persons.find(person => person.id === id)
-    if (!person) {
-        response.status(404).end()
-    }
-    response.json(person)
+    Person.findById(request.params.id).then(person => {
+        response.json(person)
+    })
 })
 
 app.delete("/api/persons/:id", (request, response) => {
     const id = request.params.id
-    persons = persons.filter(person => person.id !== id)
+    const body = request.body
 
-    response.status(204).end()
+    console.log(id)
+    console.log(body)
+
+    Person.findByIdAndDelete(id, body,
+        { new: true, runValidators: true }).then(person => {
+        response.json(person)
+    })
 })
-
-const generateId = () => {
-    let newId = String(Math.ceil(Math.random() * 100))
-    while (persons.find(person => person.id === newId)) {
-        newId = String(Math.floor(Math.random() * 100))
-    }
-    return newId
-}
 
 app.post("/api/persons", (request, response) => {
     const body = request.body
@@ -78,35 +56,22 @@ app.post("/api/persons", (request, response) => {
         })
     }
 
-    if (persons.find(person =>
-        person.name.toLowerCase() === body.name.toLowerCase()
-    )) {
-        return response.status(405).json({
-            error: 'name must be unique'
-        })
-    }
-
-    const newPerson = {
-        id: generateId(),
+    const person = new Person({
         name: body.name,
-        number: body.number
-    }
-
-    console.log(newPerson)
-
-    persons = persons.concat(newPerson)
-    response.json(persons)
+        number: body.number || false,
+    })
+    person.save().then(newPerson => response.json(newPerson))
 })
 
 
 app.patch("/api/persons/:id", (request, response) => {
     const id = request.params.id
     const body = request.body
-    console.log(persons)
 
-    persons = persons.map(person => person.id === id ? { ...person, number: body.number } : person)
-
-    response.json(persons)
+    Person.findByIdAndUpdate(id, body,
+        { new: true, runValidators: true }).then(person => {
+        response.json(person)
+    })
 })
 
 

@@ -1,12 +1,9 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 import Numbers from './components/numbers'
 import PersonForm from './components/personForm'
 import Filter from './components/filter'
 import personService from './services/persons'
 import Notification from './components/notification'
-
-
 
 
 const App = () => {
@@ -18,6 +15,7 @@ const App = () => {
 
   useEffect(() => {
     personService.getAll().then(response => {
+      console.log(response)
       setPersons(response)
     })
   }, [])
@@ -39,7 +37,7 @@ const App = () => {
     }
     const newPerson = {
       name: newName,
-      number: newNumber,
+      number: newNumber
     }
 
     const existingPerson = persons.find(person => person.name.toLowerCase() === newName.toLowerCase());
@@ -48,9 +46,9 @@ const App = () => {
       const resp = window.confirm(`${newName} is already added to phonebook, replace the old number with new one?`)
 
       if (resp) {
-        personService.update(existingPerson.id, newNumber).then(updatedPersons => {
-          // const newPersonsList = persons.map(person => person.id === existingPerson.id ? updatedPerson : person)
-          setPersons(updatedPersons)
+        personService.update(existingPerson.id, newNumber).then(updatedPerson => {
+          setPersons(persons.map(
+            person => person.id === existingPerson.id ? updatedPerson : person))
           showNotification(`Successfully updated phone number for ${existingPerson.name}`, "green")
         })
       }
@@ -61,7 +59,7 @@ const App = () => {
     else {
       personService.create(newPerson)
         .then(response => {
-          setPersons(response)
+          setPersons(persons.concat(response))
           showNotification(`Added ${newPerson.name}`, "green")
         })
     }
