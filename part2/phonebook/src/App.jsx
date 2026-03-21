@@ -11,21 +11,20 @@ const App = () => {
   const [newName, setNewName] = useState("")
   const [newNumber, setNewNumber] = useState("")
   const [newSearch, setSearch] = useState("")
-  const [newNotification, setNoification] = useState({ message: "", color: "" })
+  const [newNotification, setNotification] = useState({ message: "", color: "" })
 
   useEffect(() => {
     personService.getAll().then(response => {
-      console.log(response)
       setPersons(response)
     })
   }, [])
 
   const showNotification = (message, color) => {
-    setNoification(
+    setNotification(
       { message, color }
     )
     setTimeout(() => {
-      setNoification({ message: "", color: "" })
+      setNotification({ message: "", color: "" })
     }, 5000)
   }
 
@@ -61,6 +60,10 @@ const App = () => {
         .then(response => {
           setPersons(persons.concat(response))
           showNotification(`Added ${newPerson.name}`, "green")
+        })
+        .catch(error => {
+          console.log(error.response.data)
+          showNotification(error.response.data.error, "red")
         })
     }
     setSearch("")

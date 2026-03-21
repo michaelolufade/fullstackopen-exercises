@@ -17,13 +17,15 @@ const CountryInfo = ({country}) => {
 
   useEffect(() => {
     axios
-      .get(`http://api.openweathermap.org/geo/1.0/direct?q=${country.capital},${country.cca2.toLowerCase()}&limit=1&appid=${API_KEY}`)
-      .then(response => response.data[0])
-      .then(loc => {
-        console.log(loc)
-        setLocation([loc.lat, loc.lon])
-    })
-    }, [])
+      .get(
+        `http://api.openweathermap.org/geo/1.0/direct?q=${country.capital},${country.cca2.toLowerCase()}&limit=1&appid=${API_KEY}`,
+      )
+      .then((response) => response.data[0])
+      .then((loc) => {
+        console.log(loc);
+        setLocation([loc.lat, loc.lon]);
+      });
+  }, [country]);
 
 
   useEffect(()=> {
