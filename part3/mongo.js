@@ -1,12 +1,12 @@
-require('dotenv').config()
-const mongoose = require('mongoose')
+require("dotenv").config()
+const mongoose = require("mongoose")
 
 const name = process.argv[2]
 const number = process.argv[3]
 
 const url = `mongodb+srv://pb_db_user:${process.env.PASSWORD}@phonebook.l2z5pzh.mongodb.net/numbers?appName=Phonebook`
 
-mongoose.set('strictQuery', false)
+mongoose.set("strictQuery", false)
 
 mongoose.connect(url, { family: 4 })
 
@@ -15,10 +15,10 @@ const personSchema = new mongoose.Schema({
   number: String,
 })
 
-const Person = mongoose.model('Person', personSchema)
+const Person = mongoose.model("Person", personSchema)
 
 if (!name || !number) {
-  console.log('Phonebook:')
+  console.log("Phonebook:")
   Person.find({}).then((result) => {
     result.forEach((note) => {
       console.log(note.name, note.number)
